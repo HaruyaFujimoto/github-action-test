@@ -41,7 +41,7 @@ jobs:
         # Container Registryのときには不要だったArtifact RegistryではRegionの指定が必須
         # run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
       - name: gcloud test
-        run: gcloud iam service-accounts list
+        run: gcloud config list
 
       - name: Build Docker Image
         run: |-
