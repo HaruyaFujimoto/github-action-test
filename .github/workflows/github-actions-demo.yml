@@ -40,7 +40,9 @@ jobs:
         # run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
 
       - name: Build Docker Image
-        run: docker build -t ${{ env.IMAGE_URL }} --build-arg ENV="production" ./
+        run: -|
+         docker build -t local-image --build-arg ENV="production" ./
+         docker tag ${{ env.IMAGE_URL }}
       - name: Push Docker Image
         run: docker push ${{ env.IMAGE_URL }}
 
