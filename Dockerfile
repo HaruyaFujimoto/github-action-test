@@ -1,1 +1,3 @@
 FROM scratch
+ARG ENV
+ENV RAILS_ENV=${ENV}
