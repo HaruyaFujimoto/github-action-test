@@ -24,15 +24,15 @@ jobs:
         uses: actions/checkout@v3
 
       - id: 'auth'
-        name: 'auth gcp'
+        name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v1'
         with:
           workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ env.SERVICE_ACCOUNT_NAME }}
 
-      - id: 'setup'
-        name: 'Setup Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v0'
+      # - id: 'setup'
+      #   name: 'Setup Cloud SDK'
+      #   uses: 'google-github-actions/setup-gcloud@v0'
 
       # - name: 'Authorize Docker push'
         # Artifact Registryにpushできるように認証行う
