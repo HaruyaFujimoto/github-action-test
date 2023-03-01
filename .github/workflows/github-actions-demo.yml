@@ -23,45 +23,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - id: 'auth'
-      #   name: 'Authenticate to Google Cloud'
-      #   uses: 'google-github-actions/auth@v1'
-      #   with:
-      #     workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
-      #     service_account: ${{ env.SERVICE_ACCOUNT_NAME }}
-      
-      - id: auth
-        name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v0
+- id: 'auth'
+        name: 'auth gcp'
+        uses: 'google-github-actions/auth@v0'
         with:
-          token_format: access_token
-          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT_NAME }}
-          access_token_lifetime: 300s
-      
-      - name: Login to Artifact Registry
-        uses: docker/login-action@v1
-        with:
-          registry: asia-northeast1-docker.pkg.dev
-          username: oauth2accesstoken
-          password: ${{ steps.auth.outputs.access_token }}
+          # 事前準備で作成した`Workload Identity Providerのリソース名`と`Service Account`を指定する
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_NAME }}
+      - id: 'setup'
+        name: 'Setup Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
 
-      # - name: 'Set up Cloud SDK'
-      #   uses: 'google-github-actions/setup-gcloud@v1'
-      # - id: 'setup'
-      #   name: 'Setup Cloud SDK'
-      #   uses: 'google-github-actions/setup-gcloud@v0'
-
-      # - name: 'Authorize Docker push'
+      - name: 'Authorize Docker push'
         # Artifact Registryにpushできるように認証行う
         # Container Registryのときには不要だったArtifact RegistryではRegionの指定が必須
-        # run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
-        # run: |-
-        #   gcloud config set account ${{ env.SERVICE_ACCOUNT_NAME }}
-        #   gcloud artifacts locations list
-  
-      # - name: gcloud test
-      #   run: gcloud config list
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
 
       - name: Build Docker Image
         run: |-
