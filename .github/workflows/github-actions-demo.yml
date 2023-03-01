@@ -30,9 +30,10 @@ jobs:
           # 事前準備で作成した`Workload Identity Providerのリソース名`と`Service Account`を指定する
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT_NAME }}
-      - id: 'setup'
-        name: 'Setup Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v0'
+
+      # - id: 'setup'
+      #   name: 'Setup Cloud SDK'
+      #   uses: 'google-github-actions/setup-gcloud@v0'
 
       - name: 'Authorize Docker push'
         # Artifact Registryにpushできるように認証行う
