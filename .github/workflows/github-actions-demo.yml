@@ -23,12 +23,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT_NAME }}
+      # - id: 'auth'
+      #   name: 'Authenticate to Google Cloud'
+      #   uses: 'google-github-actions/auth@v1'
+      #   with:
+      #     workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+      #     service_account: ${{ env.SERVICE_ACCOUNT_NAME }}
       
       - id: auth
         name: Authenticate with Google Cloud
@@ -39,7 +39,7 @@ jobs:
           service_account: ${{ env.SERVICE_ACCOUNT_NAME }}
           access_token_lifetime: 300s
       
-       - name: Login to Artifact Registry
+      - name: Login to Artifact Registry
         uses: docker/login-action@v1
         with:
           registry: asia-northeast1-docker.pkg.dev
