@@ -36,10 +36,12 @@ jobs:
       #   name: 'Setup Cloud SDK'
       #   uses: 'google-github-actions/setup-gcloud@v0'
 
-      # - name: 'Authorize Docker push'
+      - name: 'Authorize Docker push'
         # Artifact Registryにpushできるように認証行う
         # Container Registryのときには不要だったArtifact RegistryではRegionの指定が必須
-        # run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+        run: gcloud artifacts locations list
+  
       - name: gcloud test
         run: gcloud config list
 
