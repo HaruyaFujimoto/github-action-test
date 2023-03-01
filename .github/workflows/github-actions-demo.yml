@@ -40,8 +40,9 @@ jobs:
         # Artifact Registryにpushできるように認証行う
         # Container Registryのときには不要だったArtifact RegistryではRegionの指定が必須
         # run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
-        run: gcloud config set account ${{ env.SERVICE_ACCOUNT_NAME }}
-        # run: gcloud artifacts locations list
+        run: |-
+          gcloud config set account ${{ env.SERVICE_ACCOUNT_NAME }}
+          gcloud artifacts locations list
   
       # - name: gcloud test
       #   run: gcloud config list
