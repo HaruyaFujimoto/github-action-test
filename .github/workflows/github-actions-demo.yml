@@ -36,13 +36,13 @@ jobs:
       #   name: 'Setup Cloud SDK'
       #   uses: 'google-github-actions/setup-gcloud@v0'
 
-      - name: 'Authorize Docker push'
+      # - name: 'Authorize Docker push'
         # Artifact Registryにpushできるように認証行う
         # Container Registryのときには不要だったArtifact RegistryではRegionの指定が必須
         # run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
-        run: |-
-          gcloud config set account ${{ env.SERVICE_ACCOUNT_NAME }}
-          gcloud artifacts locations list
+        # run: |-
+        #   gcloud config set account ${{ env.SERVICE_ACCOUNT_NAME }}
+        #   gcloud artifacts locations list
   
       # - name: gcloud test
       #   run: gcloud config list
@@ -51,8 +51,15 @@ jobs:
         run: |-
           docker build -t local/image --build-arg ENV="production" ./
           docker tag local/image ${{ env.IMAGE_URL }}
-      - name: Push Docker Image
-        run: docker push ${{ env.IMAGE_URL }}
+      
+      - id: 'deploy'
+        uses: 'google-github-actions/deploy-cloudrun@v1'
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          image: ${{ env.IMAGE_URL }}
 
-      - name: deploy into cloud run
-        run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }}
+      # - name: Push Docker Image
+      #   run: docker push ${{ env.IMAGE_URL }}
+
+      # - name: deploy into cloud run
+      #   run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }}
