@@ -29,9 +29,25 @@ jobs:
         with:
           workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ env.SERVICE_ACCOUNT_NAME }}
+      
+      - id: auth
+        name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v0
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT_NAME }}
+          access_token_lifetime: 300s
+      
+       - name: Login to Artifact Registry
+        uses: docker/login-action@v1
+        with:
+          registry: asia-northeast1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
+      # - name: 'Set up Cloud SDK'
+      #   uses: 'google-github-actions/setup-gcloud@v1'
       # - id: 'setup'
       #   name: 'Setup Cloud SDK'
       #   uses: 'google-github-actions/setup-gcloud@v0'
@@ -52,14 +68,14 @@ jobs:
           docker build -t local/image --build-arg ENV="production" ./
           docker tag local/image ${{ env.IMAGE_URL }}
       
-      - id: 'deploy'
-        uses: 'google-github-actions/deploy-cloudrun@v1'
-        with:
-          service: ${{ env.SERVICE_NAME }}
-          image: ${{ env.IMAGE_URL }}
+      # - id: 'deploy'
+      #   uses: 'google-github-actions/deploy-cloudrun@v1'
+      #   with:
+      #     service: ${{ env.SERVICE_NAME }}
+      #     image: ${{ env.IMAGE_URL }}
 
-      # - name: Push Docker Image
-      #   run: docker push ${{ env.IMAGE_URL }}
+      - name: Push Docker Image
+        run: docker push ${{ env.IMAGE_URL }}
 
-      # - name: deploy into cloud run
-      #   run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }}
+      - name: deploy into cloud run
+        run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }}
