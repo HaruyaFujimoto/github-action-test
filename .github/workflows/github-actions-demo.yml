@@ -53,8 +53,6 @@ jobs:
       # - id: 'setup'
       #   name: 'Setup Cloud SDK'
       #   uses: 'google-github-actions/setup-gcloud@v0'
-      - name: 'check gcloud init'
-        run: gcloud config list
 
       # - name: 'Authorize Docker push'
       #   # Artifact Registryにpushできるように認証行う
@@ -74,6 +72,11 @@ jobs:
 
       - name: Push Docker Image
         run: docker push ${{ env.IMAGE_URL }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      - name: 'check gcloud init'
+        run: gcloud config list
 
       - name: deploy into cloud run
         run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
