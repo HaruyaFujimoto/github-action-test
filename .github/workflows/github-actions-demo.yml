@@ -79,4 +79,4 @@ jobs:
         run: gcloud config list
 
       - name: deploy into cloud run
-        run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }}
+        run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
