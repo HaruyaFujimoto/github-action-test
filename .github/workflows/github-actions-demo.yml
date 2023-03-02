@@ -73,10 +73,16 @@ jobs:
       - name: Push Docker Image
         run: docker push ${{ env.IMAGE_URL }}
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
-      - name: 'check gcloud init'
-        run: gcloud config list
+      # - name: 'Set up Cloud SDK'
+      #   uses: 'google-github-actions/setup-gcloud@v1'
+      # - name: 'check gcloud init'
+      #   run: gcloud config list
 
-      - name: deploy into cloud run
-        run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
+      # - name: deploy into cloud run
+      #   run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
+
+      - id: 'deploy'
+      uses: 'google-github-actions/deploy-cloudrun@v1'
+      with:
+        service: ${{ env.SERVICE_NAME }}
+        image: ${{ env.IMAGE_URL }}
