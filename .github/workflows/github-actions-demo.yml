@@ -12,6 +12,7 @@ env:
   SERVICE_ACCOUNT_NAME: ${{ secrets.SERVICE_ACCOUNT_NAME }}
   IMAGE_URL: ${{ secrets.IMAGE_URL }}:${{ github.sha }}
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+  REGION: ${{ secrets.REGION }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -35,10 +36,10 @@ jobs:
       # This example uses the docker login action
       - uses: 'docker/login-action@v1'
         with:
-          registry: 'asia-northeast1-docker.pkg.dev'
+          registry: '${{ env.REGION }}-docker.pkg.dev'
           username: 'oauth2accesstoken'
           password: '${{ steps.auth.outputs.access_token }}'
-      - run: echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://asia-northeast1-docker.pkg.dev
+      - run: echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://${{ env.REGION }}-docker.pkg.dev
 
 
       # - id: 'auth'
@@ -75,4 +76,4 @@ jobs:
         run: docker push ${{ env.IMAGE_URL }}
 
       - name: deploy into cloud run
-        run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }}
+        run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
