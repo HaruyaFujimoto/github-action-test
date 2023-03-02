@@ -81,7 +81,11 @@ jobs:
       # - name: deploy into cloud run
       #   run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
 
-      - id: 'deploy'
+      - uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+          service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+      - name: 'Deploy Cloud Run'
         uses: 'google-github-actions/deploy-cloudrun@v1'
         with:
           service: ${{ env.SERVICE_NAME }}
