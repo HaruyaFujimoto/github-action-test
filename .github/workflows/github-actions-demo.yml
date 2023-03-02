@@ -86,3 +86,4 @@ jobs:
         with:
           service: ${{ env.SERVICE_NAME }}
           image: ${{ env.IMAGE_URL }}
+          region: ${{ env.REGION }}
