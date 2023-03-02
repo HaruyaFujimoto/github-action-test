@@ -14,7 +14,7 @@ env:
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
   REGION: ${{ secrets.REGION }}
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
@@ -81,6 +81,12 @@ jobs:
       # - name: deploy into cloud run
       #   run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
 
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
       - uses: 'google-github-actions/auth@v1'
         with:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
