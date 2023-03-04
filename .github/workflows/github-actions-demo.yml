@@ -84,7 +84,11 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
         with:
+          version: '>= 420.0.0'
           project_id: ${{ env.PROJECT_ID }}
+      
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
 
       - name: deploy into cloud run
         run: gcloud run deploy ${{ env.SERVICE_NAME }} --image=${{ env.IMAGE_URL }} --project=${{ env.PROJECT_ID }} --region=${{ env.REGION }} --allow-unauthenticated
