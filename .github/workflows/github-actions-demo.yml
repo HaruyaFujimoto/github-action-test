@@ -9,7 +9,7 @@ on: [push]
 
 env:
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-  SERVICE_ACCOUNT_NAME: ${{ secrets.SERVICE_ACCOUNT_NAME }}
+  SERVICE_ACCOUNT_EMAIL: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
   IMAGE_URL: ${{ secrets.IMAGE_URL }}:${{ github.sha }}
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
   REGION: ${{ secrets.REGION }}
@@ -31,7 +31,7 @@ jobs:
         with:
           token_format: 'access_token'
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_NAME }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
           access_token_lifetime: '300s'
       # This example uses the docker login action
       - uses: 'docker/login-action@v1'
@@ -48,7 +48,7 @@ jobs:
       #   with:
       #     # 事前準備で作成した`Workload Identity Providerのリソース名`と`Service Account`を指定する
       #     workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-      #     service_account: ${{ secrets.SERVICE_ACCOUNT_NAME }}
+      #     service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
 
       # - id: 'setup'
       #   name: 'Setup Cloud SDK'
@@ -81,17 +81,18 @@ jobs:
       # - name: deploy into cloud run
       #   run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    steps:
-      - uses: 'google-github-actions/auth@v1'
-        with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_NAME }}
-      - name: 'Deploy Cloud Run'
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: 'read'
+  #     id-token: 'write'
+  #   steps:
+  #     - uses: 'google-github-actions/auth@v1'
+  #       with:
+  #         workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+  #         service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+      - id: 'deploy'
+        name: 'Deploy Cloud Run'
         uses: 'google-github-actions/deploy-cloudrun@v1'
         with:
           service: ${{ env.SERVICE_NAME }}

@@ -1,3 +1,2 @@
-FROM scratch
-ARG ENV
-ENV RAILS_ENV=${ENV}
+FROM nginx:mainline-alpine-slim
+EXPOSE 80
