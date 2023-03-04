@@ -10,7 +10,8 @@ on: [push]
 env:
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   SERVICE_ACCOUNT_EMAIL: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
-  IMAGE_URL: ${{ secrets.IMAGE_URL }}:${{ github.sha }}
+  # IMAGE_URL: ${{ secrets.IMAGE_URL }}:${{ github.sha }}
+  IMAGE_URL: ${{ secrets.IMAGE_URL }}:0af653f157308294b3687c47b01681a82424972f
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
   REGION: ${{ secrets.REGION }}
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
@@ -25,54 +26,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-    ## 
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          token_format: 'access_token'
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
-          access_token_lifetime: '300s'
-      # This example uses the docker login action
-      - uses: 'docker/login-action@v1'
-        with:
-          registry: '${{ env.REGION }}-docker.pkg.dev'
-          username: 'oauth2accesstoken'
-          password: '${{ steps.auth.outputs.access_token }}'
-      - run: echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://${{ env.REGION }}-docker.pkg.dev
+      #### start docker ####
 
-
+      # ## 
       # - id: 'auth'
-      #   name: 'auth gcp'
-      #   uses: 'google-github-actions/auth@v0'
+      #   name: 'Authenticate to Google Cloud'
+      #   uses: 'google-github-actions/auth@v1'
       #   with:
-      #     # 事前準備で作成した`Workload Identity Providerのリソース名`と`Service Account`を指定する
+      #     token_format: 'access_token'
       #     workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
       #     service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
-
-      # - id: 'setup'
-      #   name: 'Setup Cloud SDK'
-      #   uses: 'google-github-actions/setup-gcloud@v0'
-
-      # - name: 'Authorize Docker push'
-      #   # Artifact Registryにpushできるように認証行う
-      #   # Container Registryのときには不要だったArtifact RegistryではRegionの指定が必須
-      #   run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
-
-      - name: Build Docker Image
-        run: |-
-          docker build -t local/image --build-arg ENV="production" ./
-          docker tag local/image ${{ env.IMAGE_URL }}
+      #     access_token_lifetime: '300s'
       
-      # - id: 'deploy'
-      #   uses: 'google-github-actions/deploy-cloudrun@v1'
+      # # This example uses the docker login action
+      # - uses: 'docker/login-action@v1'
       #   with:
-      #     service: ${{ env.SERVICE_NAME }}
-      #     image: ${{ env.IMAGE_URL }}
+      #     registry: '${{ env.REGION }}-docker.pkg.dev'
+      #     username: 'oauth2accesstoken'
+      #     password: '${{ steps.auth.outputs.access_token }}'
+      # - run: echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin https://${{ env.REGION }}-docker.pkg.dev
 
-      - name: Push Docker Image
-        run: docker push ${{ env.IMAGE_URL }}
+      # - name: Build Docker Image
+      #   run: |-
+      #     docker build -t local/image --build-arg ENV="production" ./
+      #     docker tag local/image ${{ env.IMAGE_URL }}
+      
+      # - name: Push Docker Image
+      #   run: docker push ${{ env.IMAGE_URL }}
+      #### end docker ####
 
       # - name: 'Set up Cloud SDK'
       #   uses: 'google-github-actions/setup-gcloud@v1'
@@ -88,10 +69,10 @@ jobs:
   #     contents: 'read'
   #     id-token: 'write'
   #   steps:
-  #     - uses: 'google-github-actions/auth@v1'
-  #       with:
-  #         workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-  #         service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+      - uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
       - id: 'deploy'
         name: 'Deploy Cloud Run'
         uses: 'google-github-actions/deploy-cloudrun@v1'
