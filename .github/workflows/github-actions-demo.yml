@@ -87,8 +87,4 @@ jobs:
           version: '>= 363.0.0'
 
       - name: deploy into cloud run
-        run: gcloud run deploy ${{ env.SERVICE_NAME }} \
-          --project ${{ env.PROJECT_ID }} \
-          --image ${{ env.IMAGE_URL }} \
-          --region ${{ env.REGION }} \
-          --allow-unauthenticated
+        run: gcloud run deploy ${{ env.SERVICE_NAME }} --image=${{ env.IMAGE_URL }} --project=${{ env.PROJECT_ID }} --region=${{ env.REGION }} --allow-unauthenticated
