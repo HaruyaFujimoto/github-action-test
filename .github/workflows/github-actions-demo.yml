@@ -13,7 +13,7 @@ env:
   IMAGE_URL: ${{ secrets.IMAGE_URL }}:${{ github.sha }}
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
   REGION: ${{ secrets.REGION }}
-  PROJECT_ID: ${{ action-test-02-379612 }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
