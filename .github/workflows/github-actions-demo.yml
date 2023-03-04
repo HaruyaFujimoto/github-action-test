@@ -60,8 +60,6 @@ jobs:
       # - name: 'check gcloud init'
       #   run: gcloud config list
 
-      # - name: deploy into cloud run
-      #   run: gcloud run deploy ${{ env.SERVICE_NAME }} --image ${{ env.IMAGE_URL }} --region ${{ env.REGION }}
 
   # deploy:
   #   runs-on: ubuntu-latest
@@ -73,11 +71,24 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
-      - id: 'deploy'
-        name: 'Deploy Cloud Run'
-        uses: 'google-github-actions/deploy-cloudrun@v1'
+
+      # - id: 'deploy'
+      #   name: 'Deploy Cloud Run'
+      #   uses: 'google-github-actions/deploy-cloudrun@v1'
+      #   with:
+      #     service: ${{ env.SERVICE_NAME }}
+      #     image: ${{ env.IMAGE_URL }}
+      #     region: ${{ env.REGION }}
+      #     project_id: ${{ env.PROJECT_ID }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
         with:
-          service: ${{ env.SERVICE_NAME }}
-          image: ${{ env.IMAGE_URL }}
-          region: ${{ env.REGION }}
-          project_id: ${{ env.PROJECT_ID }}
+          version: '>= 363.0.0'
+
+      - name: deploy into cloud run
+        run: gcloud run deploy ${{ env.SERVICE_NAME }} \
+          --project="${PROJECT_ID}" \
+          --image ${{ env.IMAGE_URL }} \
+          --region ${{ env.REGION }} \
+          --allow-unauthenticated
