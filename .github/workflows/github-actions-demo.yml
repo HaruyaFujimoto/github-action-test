@@ -1,30 +1,32 @@
 name: Production Deployment
 
+## prod
 # on:
 #   push:
 #     branches:
 #       - main
 
+## test
 on: [push]
 
 env:
   WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
   SERVICE_ACCOUNT_EMAIL: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
-  # IMAGE_URL: ${{ secrets.IMAGE_URL }}:${{ github.sha }}
-  IMAGE_URL: ${{ secrets.IMAGE_URL }}:0af653f157308294b3687c47b01681a82424972f
+  # IMAGE_URL: ${{ secrets.IMAGE_URL }}:${{ github.sha }} # prod
+  IMAGE_URL: ${{ secrets.IMAGE_URL }}:0af653f157308294b3687c47b01681a82424972f # test
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+  SERVICE_URL: ${{ secrets.SERVICE_URL }}
   REGION: ${{ secrets.REGION }}
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    ## build docker image and push image
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # build-and-push-container-image:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: 'read'
+  #     id-token: 'write'
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
       #### start docker ####
 
@@ -34,8 +36,8 @@ jobs:
       #   uses: 'google-github-actions/auth@v1'
       #   with:
       #     token_format: 'access_token'
-      #     workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-      #     service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+      #     workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+      #     service_account: ${{ env.SERVICE_ACCOUNT_EMAIL }}
       #     access_token_lifetime: '300s'
       
       # # This example uses the docker login action
@@ -61,34 +63,47 @@ jobs:
       #   run: gcloud config list
 
 
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: 'read'
-  #     id-token: 'write'
-  #   steps:
-      - uses: 'google-github-actions/auth@v1'
-        with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+  deploy-cloud-run:
+    # needs: build-and-push-container-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      # - id: 'auth'
+      # name: 'Authenticate to Google Cloud'
+      # uses: 'google-github-actions/auth@v1'
+      # with:
+      #   token_format: 'id_token'
+      #   workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+      #   service_account: ${{ env.SERVICE_ACCOUNT_EMAIL }}
+      #   id_token_audience: ${{ env.SERVICE_URL }}
+      #   id_token_include_email: true # optional
 
-      - id: 'deploy'
-        name: 'Deploy Cloud Run'
-        uses: 'google-github-actions/deploy-cloudrun@v1'
+
+
+      # - id: 'deploy'
+      #   name: 'Deploy Cloud Run'
+      #   uses: 'google-github-actions/deploy-cloudrun@v1'
+      #   with:
+      #     service: ${{ env.SERVICE_NAME }}
+      #     image: ${{ env.IMAGE_URL }}
+      #     region: ${{ env.REGION }}
+      #     project_id: ${{ env.PROJECT_ID }}
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: '${{ env.SERVICE_ACCOUNT_EMAIL }}' 
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
         with:
           service: ${{ env.SERVICE_NAME }}
-          image: ${{ env.IMAGE_URL }}
           region: ${{ env.REGION }}
+          # NOTE: If using a pre-built image, update the image name here
+          image: ${{ env.IMAGE_URL }}
           project_id: ${{ env.PROJECT_ID }}
-
-      # - name: 'Set up Cloud SDK'
-      #   uses: 'google-github-actions/setup-gcloud@v1'
-      #   with:
-      #     version: '>= 420.0.0'
-      #     project_id: ${{ env.PROJECT_ID }}
-      
-      # - name: 'Use gcloud CLI'
-      #   run: 'gcloud info'
-
-      # - name: deploy into cloud run
-      #   run: gcloud run deploy ${{ env.SERVICE_NAME }} --image=${{ env.IMAGE_URL }} --project=${{ env.PROJECT_ID }} --region=${{ env.REGION }} --allow-unauthenticated
